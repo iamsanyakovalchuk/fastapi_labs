@@ -19,3 +19,11 @@ RUN poetry install --no-root --no-interaction --no-ansi
 COPY . /app/
 
 CMD ["uvicorn", "src.fastapi_lab1.main:app", "--host", "0.0.0.0", "--port", "8000", "--reload"]
+
+RUN chmod +x entrypoint.sh
+
+ENTRYPOINT ["./entrypoint.sh"]
+
+COPY . .
+RUN chmod +x entrypoint.sh
+ENTRYPOINT ["./entrypoint.sh"]
