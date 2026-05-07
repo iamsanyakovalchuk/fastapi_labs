@@ -1,15 +1,16 @@
 from fastapi import APIRouter, HTTPException
-from app.schemas.user import UserSchema
+# Імпортуємо правильну назву класу, яку ми створили в schemas/user.py
+from app.schemas.user import UserCreate
 
 router = APIRouter(prefix="/users", tags=["users"])
 
 users_db = {}
 
 @router.post("/")
-def create_user(user: UserSchema):
+def create_user(user: UserCreate):
     if user.email in users_db:
         raise HTTPException(status_code=400, detail="User already exists")
-    users_db[user.email] = user.model_dump() # Зберігаємо дані
+    users_db[user.email] = user.model_dump()
     return {"message": "User created", "data": user}
 
 @router.get("/")
@@ -23,7 +24,7 @@ def get_user(email: str):
     return users_db[email]
 
 @router.put("/{email}")
-def update_user(email: str, updated_user: UserSchema):
+def update_user(email: str, updated_user: UserCreate):
     if email not in users_db:
         raise HTTPException(status_code=404, detail="User not found")
     users_db[email] = updated_user.model_dump()
