@@ -2,20 +2,19 @@ from sqlalchemy import Column, Integer, String, ForeignKey, Float, DateTime
 from sqlalchemy.orm import relationship, DeclarativeBase
 from datetime import datetime
 
-
 class Base(DeclarativeBase):
     pass
-
 
 class User(Base):
     __tablename__ = "users"
     id = Column(Integer, primary_key=True)
     email = Column(String, unique=True, nullable=False)
+    username = Column(String, unique=True, nullable=False)  # Твій НІК
     hashed_password = Column(String, nullable=False)
+    age = Column(Integer)  # Твій ВІК
 
     profile = relationship("Profile", back_populates="user", uselist=False)
     cars = relationship("Car", back_populates="owner")
-
 
 class Profile(Base):
     __tablename__ = "profiles"
@@ -25,7 +24,6 @@ class Profile(Base):
     user_id = Column(Integer, ForeignKey("users.id"))
 
     user = relationship("User", back_populates="profile")
-
 
 class Car(Base):
     __tablename__ = "cars"
@@ -38,7 +36,6 @@ class Car(Base):
     owner = relationship("User", back_populates="cars")
     records = relationship("ServiceRecord", back_populates="car")
 
-
 class ServiceRecord(Base):
     __tablename__ = "service_records"
     id = Column(Integer, primary_key=True)
@@ -50,7 +47,6 @@ class ServiceRecord(Base):
 
     car = relationship("Car", back_populates="records")
     parts = relationship("Part", back_populates="record")
-
 
 class Part(Base):
     __tablename__ = "parts"
