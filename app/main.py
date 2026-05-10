@@ -1,13 +1,14 @@
 from fastapi import FastAPI
-from app.api.users import router as user_router
+from app.api.users import router as api_router
 
 app = FastAPI(
-    title="User CRUD API",
-    description="API для керування користувачами (Лабораторна робота №3)",
-    version="1.0.0"
+    title="AutoLog Project API",
+    description="API для керування сервісом автомобілів (Лабораторна робота №4)",
+    version="2.0.0"
 )
-app.include_router(user_router)
+
+app.include_router(api_router)
 
 @app.get("/", tags=["Root"])
 async def root():
-    return {"message": "SixSevenSIXSEVEEEEEEEEEEEEEEEEEEEEEEN676767"}
+    return {"message": "AutoLog System is Online! SixSeven67"}
