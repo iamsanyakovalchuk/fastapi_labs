@@ -60,6 +60,10 @@ class Profile(ProfileBase):
         from_attributes = True
 
 # --- USER ---
+class UserLogin(BaseModel):
+    email: EmailStr
+    password: str
+
 class UserBase(BaseModel):
     email: EmailStr
     username: str
