@@ -4,6 +4,9 @@ from sqlalchemy.future import select
 from typing import List
 from jose import jwt, JWTError
 
+# Імпортуємо Counter з бібліотеки Prometheus
+from prometheus_client import Counter
+
 from app.core.db import get_session
 from app.models.models import User, Profile, Car, ServiceRecord, Part
 from app.schemas.schemas import UserCreate, CarCreate, ServiceRecordCreate, PartCreate, UserLogin
@@ -11,6 +14,8 @@ from app.core.security import get_password_hash, verify_password, create_access_
 
 router = APIRouter(tags=["AutoLog API"])
 
+# Ініціалізуємо кастомну метрику реєстрацій
+REGISTRATION_COUNTER = Counter("total_registrations", "Загальна кількість нових реєстрацій")
 
 
 async def get_current_user(request: Request, db: AsyncSession = Depends(get_session)):
@@ -34,7 +39,6 @@ async def get_current_user(request: Request, db: AsyncSession = Depends(get_sess
     return user
 
 
-
 @router.post("/register", status_code=status.HTTP_201_CREATED)
 async def register(user_in: UserCreate, db: AsyncSession = Depends(get_session)):
     existing = await db.execute(select(User).where(User.email == user_in.email))
@@ -56,6 +60,9 @@ async def register(user_in: UserCreate, db: AsyncSession = Depends(get_session))
     profile = Profile(full_name=user_in.username, phone="000", user_id=new_user.id)
     db.add(profile)
     await db.commit()
+
+    # Збільшуємо лічильник на 1 після успішної реєстрації
+    REGISTRATION_COUNTER.inc()
 
     return {"message": "Успішна реєстрація", "id": new_user.id}
 
@@ -84,7 +91,6 @@ async def logout(response: Response):
     return {"message": "Ви вийшли з системи"}
 
 
-
 @router.get("/users/me")
 async def get_my_profile(current_user: User = Depends(get_current_user)):
     return {
@@ -102,7 +108,6 @@ async def add_car(car_in: CarCreate, db: AsyncSession = Depends(get_session),
     db.add(new_car)
     await db.commit()
     return new_car
-
 
 
 @router.get("/users/", response_model=List[UserCreate])
