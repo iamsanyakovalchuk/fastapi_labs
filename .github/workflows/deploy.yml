@@ -30,6 +30,8 @@ jobs:
           key: ${{ secrets.SSH_KEY }}
           script: |
             cd /home/ubuntu/fastapi_project
+            # Видаємо права на запуск скрипта
+            sudo chmod +x entrypoint.sh
             # Зупиняємо старі контейнери (якщо є)
             sudo docker-compose down
             # Запускаємо нові в фоновому режимі та перезбираємо образ
