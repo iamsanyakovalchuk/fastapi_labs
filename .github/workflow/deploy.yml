@@ -1,0 +1,36 @@
+name: CI/CD Pipeline to AWS
+
+on:
+  push:
+    branches: [ "main", "master", "dev" ] # Запуститься, коли ти запушиш в будь-яку з цих гілок
+
+jobs:
+  deploy:
+    name: Deploy to EC2
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: 1. Завантажуємо свіжий код
+        uses: actions/checkout@v3
+
+      - name: 2. Копіюємо файли проекту на сервер
+        uses: appleboy/scp-action@master
+        with:
+          host: ${{ secrets.HOST }}
+          username: ${{ secrets.USERNAME }}
+          key: ${{ secrets.SSH_KEY }}
+          source: "."
+          target: "/home/ubuntu/fastapi_project"
+
+      - name: 3. Перезапускаємо Docker на сервері
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ secrets.HOST }}
+          username: ${{ secrets.USERNAME }}
+          key: ${{ secrets.SSH_KEY }}
+          script: |
+            cd /home/ubuntu/fastapi_project
+            # Зупиняємо старі контейнери (якщо є)
+            sudo docker-compose down
+            # Запускаємо нові в фоновому режимі та перезбираємо образ
+            sudo docker-compose up -d --build
